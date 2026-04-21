@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mentee Dashboard</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      color: white;
+    }
+
+    nav {
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.3);
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      color: black;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 15px 0;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #5a67d8;
+    }
+
+    .empty {
+      text-align: center;
+      margin-top: 50px;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body>
+
+<nav>
+  <h2>📘 Mentee Dashboard</h2>
+  <button onclick="logout()">Logout</button>
+</nav>
+
+<div class="container">
+  <div id="challenges">Loading challenges...</div>
+</div>
+
+<script>
+
+// LOAD CHALLENGES
+fetch("http://localhost:5000/api/challenge/all")
+.then(res => res.json())
+.then(data => {
+
+  console.log("DATA:", data);
+
+  let html = "";
+
+  if(data.length === 0){
+    html = `<p class="empty">No challenges available 😢</p>`;
+  } else {
+
+    data.forEach(c => {
+      html += `
+        <div class="card">
+          <h3>${c.title}</h3>
+          <p>${c.description}</p>
+
+          <textarea id="ans${c.id}" placeholder="Write your solution..."></textarea>
+
+          <button onclick="submitAnswer(${c.id})">Submit</button>
+        </div>
+      `;
+    });
+  }
+
+  document.getElementById("challenges").innerHTML = html;
+})
+.catch(err => {
+  console.log(err);
+  alert("Error loading challenges ❌");
+});
+
+
+// SUBMIT FUNCTION
+function submitAnswer(id){
+
+  const userData = JSON.parse(localStorage.getItem("user"));
+
+  if(!userData){
+    alert("Please login first");
+    return;
+  }
+
+  const user = userData.user;
+
+  const answer = document.getElementById("ans"+id).value;
+
+  fetch("http://localhost:5000/api/submission", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      challenge_id: id,
+      mentee_id: user.id,
+      answer: answer
+    })
+  })
+}
+// LOGOUT
+function logout(){
+  localStorage.removeItem("user");
+  window.location.href = "index.html";
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mentor Dashboard</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  color:white;
+}
+
+nav{
+  display:flex;
+  justify-content:space-between;
+  padding:15px 30px;
+  background:rgba(0,0,0,0.3);
+}
+
+.container{
+  padding:20px;
+}
+
+.card{
+  background:white;
+  color:black;
+  padding:20px;
+  border-radius:10px;
+  margin-top:20px;
+}
+
+input, textarea{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:8px;
+}
+
+button{
+  margin-top:10px;
+  padding:10px;
+  background:#667eea;
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#5a67d8;
+}
+
+.challenge{
+  margin-top:10px;
+  padding:10px;
+  background:#f1f1f1;
+  border-radius:8px;
+}
+</style>
+
+</head>
+<body>
+
+<nav>
+  <h2>👨‍🏫 Mentor Dashboard</h2>
+  <button onclick="logout()">Logout</button>
+</nav>
+
+<div class="container">
+
+<div class="card">
+<h3>Create Weekly Challenge</h3>
+
+<input type="text" id="title" placeholder="Challenge Title">
+<textarea id="desc" placeholder="Description"></textarea>
+<input type="date" id="deadline">
+
+<button onclick="createChallenge()">Create Challenge</button>
+</div>
+
+<div class="card">
+<h3>Created Challenges</h3>
+<div id="list">Loading...</div>
+</div>
+
+</div>
+
+<script>
+
+// LOAD CHALLENGES
+function loadChallenges() {
+ fetch("http://localhost:5000/api/challenge/all")
+ .then(res => res.json())
+ .then(data => {
+
+   let html = "";
+
+   if(data.length === 0){
+     html = "<p>No challenges yet 😢</p>";
+   } else {
+     data.forEach(item => {
+       html += `
+         <div class="challenge">
+           📌 ${item.title} <br>
+           <small>${item.deadline || "No deadline"}</small>
+         </div>
+       `;
+     });
+   }
+
+   document.getElementById("list").innerHTML = html;
+ });
+}
+
+
+// CREATE CHALLENGE
+function createChallenge() {
+
+ const userData = JSON.parse(localStorage.getItem("user"));
+
+ if(!userData){
+   alert("Please login first");
+   return;
+ }
+
+ const user = userData.user;
+
+ const title = document.getElementById("title").value;
+ const desc = document.getElementById("desc").value;
+ const deadline = document.getElementById("deadline").value;
+
+ if(!title || !desc){
+   alert("Please fill all fields");
+   return;
+ }
+
+ fetch("http://localhost:5000/api/challenge/create", {
+   method:"POST",
+   headers: {"Content-Type":"application/json"},
+   body: JSON.stringify({
+     mentor_id: user.id,
+     title,
+     description: desc,
+     deadline
+   })
+ })
+ .then(res => res.json())
+ .then(data => {
+   alert("Challenge Created ✅");
+   loadChallenges();
+ })
+ .catch(err => {
+   console.log(err);
+   alert("Error ❌");
+ });
+}
+
+
+// LOGOUT
+function logout(){
+  localStorage.removeItem("user");
+  window.location.href = "index.html";
+}
+
+
+// INIT
+loadChallenges();
+
+</script>
+
+</body>
+</html>

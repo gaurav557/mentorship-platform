@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MentorHub</title>
+
+<style>
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* BODY */
+body {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  height: 100vh;
+  color: white;
+}
+
+/* NAVBAR */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 50px;
+}
+
+/* LOGO */
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  animation: glow 2s infinite alternate;
+}
+
+.logo span {
+  color: #ffd369;
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 5px #fff; }
+  to { text-shadow: 0 0 20px #ffd369; }
+}
+
+/* NAV LINKS */
+nav a {
+  color: white;
+  margin-left: 20px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+nav a:hover {
+  color: #ffd369;
+}
+
+/* MAIN LAYOUT */
+.container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 80vh;
+}
+
+/* LEFT CONTENT */
+.left {
+  max-width: 500px;
+  animation: slideLeft 1s ease;
+}
+
+.left h1 {
+  font-size: 40px;
+  margin-bottom: 20px;
+}
+
+.left p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+/* LOGIN BOX */
+.login-box {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(15px);
+  padding: 30px;
+  border-radius: 15px;
+  width: 320px;
+  text-align: center;
+  animation: slideRight 1s ease;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.login-box h2 {
+  margin-bottom: 15px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 8px;
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  padding: 12px;
+  background: #ff7a18;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #ffb347;
+  transform: scale(1.05);
+}
+
+/* CHALLENGES */
+.challenges {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.challenge-card {
+  background: white;
+  color: black;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+  transition: 0.3s;
+}
+
+.challenge-card:hover {
+  transform: translateY(-5px);
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 10px;
+}
+
+/* ANIMATIONS */
+@keyframes slideLeft {
+  from { transform: translateX(-100px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideRight {
+  from { transform: translateX(100px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* RESPONSIVE */
+@media(max-width: 900px) {
+  .container {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="logo">
+    🚀 Mentor<span>Hub</span>
+  </div>
+
+  <div>
+    <a href="index.html">Home</a>
+    <a href="features.html">Features</a>
+    <a href="register.html">Register</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- LEFT TEXT -->
+  <div class="left">
+    <h1>Learn by Doing, Not Just Watching 🚀</h1>
+    <p>
+      Mentors assign weekly real-world challenges.  
+      Mentees solve them, get feedback, and track progress.
+    </p>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="login-box">
+    <h2>Login</h2>
+
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+
+    <p style="margin-top:10px;">
+      New user? <a href="register.html" style="color:#ffd369;">Register</a>
+    </p>
+
+    <!-- RECENT CHALLENGES -->
+    <div class="challenges">
+      <h3>Recent Challenges</h3>
+
+      <div class="challenge-card">
+        Build Login System  
+        <br><small>Mentor: Rahul | 15 Apr</small>
+      </div>
+
+      <div class="challenge-card">
+        JavaScript DOM Task  
+        <br><small>Mentor: Priya | 14 Apr</small>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 MentorHub | Shivam</p>
+</footer>
+<script>
+function login() {
+  fetch("http://localhost:5000/api/auth/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      email: document.getElementById("email").value,
+      password: document.getElementById("password").value
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+
+    console.log(data); // 👈 DEBUG
+
+    if(data.user && data.user.role === "mentor"){
+      localStorage.setItem("user", JSON.stringify(data));
+      window.location.href = "mentor.html";
+    } 
+    else if(data.user && data.user.role === "mentee"){
+      localStorage.setItem("user", JSON.stringify(data));
+      window.location.href = "mentee.html";
+    } 
+    else {
+      alert(data.message || "Login Failed");
+    }
+  })
+  .catch(err => {
+    console.log(err);
+    alert("Server Error ❌");
+  });
+}
+</script>
+
+
+</body>
+</html>
