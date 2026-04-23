@@ -5,165 +5,176 @@
 <title>MentorHub</title>
 
 <style>
-/* RESET */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
 }
-
-/* BODY */
-body {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  height: 100vh;
-  color: white;
+body{
+  background: radial-gradient(circle at top left,#0f2027,#203a43,#2c5364);
+  color:white;
 }
 
 /* NAVBAR */
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 50px;
+nav{
+  display:flex;
+  justify-content:space-between;
+  padding:20px 50px;
 }
 
-/* LOGO */
-.logo {
-  font-size: 24px;
-  font-weight: bold;
-  animation: glow 2s infinite alternate;
+.logo{
+  font-size:24px;
+  font-weight:bold;
+  animation:glow 2s infinite alternate;
 }
 
-.logo span {
-  color: #ffd369;
+.logo span{
+  color:#ff7a18;
 }
 
-@keyframes glow {
-  from { text-shadow: 0 0 5px #fff; }
-  to { text-shadow: 0 0 20px #ffd369; }
+@keyframes glow{
+  from{ text-shadow:0 0 5px #fff; }
+  to{ text-shadow:0 0 20px #ff7a18; }
+}
+nav a{
+  color:white;
+  margin-left:20px;
+  text-decoration:none;
+}
+/* MAIN */
+.main{
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  height:85vh;
+  padding:20px;
+}
+/* LEFT SIDE */
+.left{
+  width:50%;
+  padding:40px;
+  background:rgba(255,255,255,0.05);
+  border-radius:20px;
+  animation:slideLeft 1s ease;
+}
+.left small{
+  color:#ff7a18;
+  letter-spacing:2px;
+}
+.left h1{
+  font-size:60px;
+  margin:20px 0;
+}
+.left p{
+  opacity:0.7;
+  max-width:500px;
+}
+.tags{
+  margin-top:20px;
+}
+.tags span{
+  display:inline-block;
+  padding:10px 15px;
+  background:rgba(255,255,255,0.1);
+  border-radius:20px;
+  margin:5px;
+}
+/* RIGHT SIDE */
+.right{
+  width:40%;
+}
+/* CARD */
+.card{
+  background:rgba(255,255,255,0.05);
+  padding:30px;
+  border-radius:20px;
+  backdrop-filter:blur(15px);
+  box-shadow:0 10px 40px rgba(0,0,0,0.5);
+  animation:slideRight 1s ease;
+}
+/* TOGGLE */
+.toggle{
+  display:flex;
+  margin-bottom:20px;
+}
+.toggle button{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:20px;
+  margin:5px;
+  cursor:pointer;
+}
+.active{
+  background:linear-gradient(45deg,#ff7a18,#ff4e50);
+}
+.inactive{
+  background:#1c2b3a;
+  color:#aaa;
+}
+/* TEXT */
+.card h2{
+  margin-bottom:10px;
+}
+.card p{
+  font-size:14px;
+  opacity:0.7;
+}
+/* BUTTON GROUP */
+.actions{
+  display:flex;
+  gap:10px;
+  margin:15px 0;
+}
+.actions button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
 }
 
-/* NAV LINKS */
-nav a {
-  color: white;
-  margin-left: 20px;
-  text-decoration: none;
-  transition: 0.3s;
+.login-btn{
+  background:linear-gradient(45deg,#ff7a18,#ff4e50);
+  color:white;
 }
-
-nav a:hover {
-  color: #ffd369;
+.create-btn{
+  background:#1c2b3a;
+  color:white;
 }
-
-/* MAIN LAYOUT */
-.container {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  height: 80vh;
+/* INPUT */
+input{
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border:none;
+  border-radius:10px;
+  background:#1c2b3a;
+  color:white;
 }
-
-/* LEFT CONTENT */
-.left {
-  max-width: 500px;
-  animation: slideLeft 1s ease;
+/* MAIN BUTTON */
+.enter{
+  width:100%;
+  padding:12px;
+  background:linear-gradient(45deg,#ff7a18,#ff4e50);
+  border:none;
+  border-radius:12px;
+  margin-top:10px;
+  cursor:pointer;
 }
-
-.left h1 {
-  font-size: 40px;
-  margin-bottom: 20px;
+/* ANIMATION */
+@keyframes slideLeft{
+  from{ transform:translateX(-100px); opacity:0; }
+  to{ transform:translateX(0); opacity:1; }
 }
-
-.left p {
-  font-size: 18px;
-  opacity: 0.9;
+@keyframes slideRight{
+  from{ transform:translateX(100px); opacity:0; }
+  to{ transform:translateX(0); opacity:1; }
 }
-
-/* LOGIN BOX */
-.login-box {
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(15px);
-  padding: 30px;
-  border-radius: 15px;
-  width: 320px;
-  text-align: center;
-  animation: slideRight 1s ease;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-.login-box h2 {
-  margin-bottom: 15px;
-}
-
-input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border: none;
-  border-radius: 8px;
-}
-
-/* BUTTON */
-button {
-  width: 100%;
-  padding: 12px;
-  background: #ff7a18;
-  border: none;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: 0.3s;
-}
-
-button:hover {
-  background: #ffb347;
-  transform: scale(1.05);
-}
-
-/* CHALLENGES */
-.challenges {
-  margin-top: 20px;
-  text-align: left;
-}
-
-.challenge-card {
-  background: white;
-  color: black;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 10px;
-  transition: 0.3s;
-}
-
-.challenge-card:hover {
-  transform: translateY(-5px);
-}
-
-/* FOOTER */
-footer {
-  text-align: center;
-  padding: 10px;
-}
-
-/* ANIMATIONS */
-@keyframes slideLeft {
-  from { transform: translateX(-100px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes slideRight {
-  from { transform: translateX(100px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-/* RESPONSIVE */
-@media(max-width: 900px) {
-  .container {
-    flex-direction: column;
-    text-align: center;
-  }
+footer{
+  text-align:center;
+  padding:10px;
 }
 </style>
 </head>
@@ -172,10 +183,7 @@ footer {
 
 <!-- NAVBAR -->
 <nav>
-  <div class="logo">
-    🚀 Mentor<span>Hub</span>
-  </div>
-
+  <div class="logo">🚀 Mentor<span>Hub</span></div>
   <div>
     <a href="index.html">Home</a>
     <a href="features.html">Features</a>
@@ -184,87 +192,113 @@ footer {
 </nav>
 
 <!-- MAIN -->
-<div class="container">
+<div class="main">
 
-  <!-- LEFT TEXT -->
+  <!-- LEFT -->
   <div class="left">
-    <h1>Learn by Doing, Not Just Watching 🚀</h1>
+    <small>MENTORSHIP PLATFORM</small>
+    <h1>
+      Build challenges,<br>
+      coach learners,<br>
+      and track progress
+    </h1>
+
     <p>
-      Mentors assign weekly real-world challenges.  
-      Mentees solve them, get feedback, and track progress.
+      Mentors create challenges and review performance.
+      Students solve tasks and track improvement.
     </p>
+
+    <div class="tags">
+      <span>Mentor portal</span>
+      <span>Progress tracking</span>
+      <span>mentee protal</span>
+    </div>
   </div>
 
-  <!-- LOGIN -->
-  <div class="login-box">
-    <h2>Login</h2>
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="card">
 
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-
-    <button onclick="login()">Login</button>
-
-    <p style="margin-top:10px;">
-      New user? <a href="register.html" style="color:#ffd369;">Register</a>
-    </p>
-
-    <!-- RECENT CHALLENGES -->
-    <div class="challenges">
-      <h3>Recent Challenges</h3>
-
-      <div class="challenge-card">
-        Build Login System  
-        <br><small>Mentor: Rahul | 15 Apr</small>
+      <div class="toggle">
+        <button id="mentorBtn" class="active" onclick="setRole('mentor')">Mentor Login</button>
+        <button id="menteeBtn" class="inactive" onclick="setRole('mentee')">Student Login</button>
       </div>
 
-      <div class="challenge-card">
-        JavaScript DOM Task  
-        <br><small>Mentor: Priya | 14 Apr</small>
+      <h2 id="title">Mentor workspace access</h2>
+
+      <p>
+        Login to manage challenges and track student progress.
+      </p>
+
+      <div class="actions">
+        <button class="login-btn">Login</button>
+        <button class="create-btn" onclick="location.href='register.html'">Create ID</button>
       </div>
+
+      <input type="email" id="email" placeholder="Email address">
+      <input type="password" id="password" placeholder="Password">
+
+      <button class="enter" onclick="login()">Enter Workspace</button>
+
+
     </div>
-
   </div>
 
 </div>
 
-<!-- FOOTER -->
 <footer>
-  <p>© 2026 MentorHub | Shivam</p>
+  © 2026 MentorHub 
 </footer>
+
 <script>
-function login() {
-  fetch("http://localhost:5000/api/auth/login", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      email: document.getElementById("email").value,
-      password: document.getElementById("password").value
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
+let role="mentor";
 
-    console.log(data); // 👈 DEBUG
+function setRole(r){
+  role=r;
 
-    if(data.user && data.user.role === "mentor"){
-      localStorage.setItem("user", JSON.stringify(data));
-      window.location.href = "mentor.html";
-    } 
-    else if(data.user && data.user.role === "mentee"){
-      localStorage.setItem("user", JSON.stringify(data));
-      window.location.href = "mentee.html";
-    } 
-    else {
-      alert(data.message || "Login Failed");
-    }
+  document.getElementById("title").innerText =
+    r==="mentor" ? "Mentor workspace access" : "Student workspace access";
+
+  mentorBtn.className = r==="mentor" ? "active" : "inactive";
+  menteeBtn.className = r==="mentee" ? "active" : "inactive";
+}
+
+// LOGIN
+function login(){
+ fetch("http://localhost:5000/api/auth/login",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    email:email.value,
+    password:password.value
   })
-  .catch(err => {
-    console.log(err);
-    alert("Server Error ❌");
-  });
+ })
+ .then(res=>res.json())
+ .then(data=>{
+
+  if(!data.user){
+    alert("Login failed ❌");
+    return;
+  }
+
+  // 🔥 MAIN FIX HERE
+  if(data.user.role !== role){
+    alert("❌ Wrong role selected!\nPlease select correct login type.");
+    return;
+  }
+
+  localStorage.setItem("user", JSON.stringify(data));
+
+  if(role === "mentor"){
+    window.location.href="mentor.html";
+  } else {
+    window.location.href="mentee.html";
+  }
+
+ })
+ .catch(()=>alert("Server error ❌"));
 }
 </script>
-
 
 </body>
 </html>

@@ -1,19 +1,28 @@
 const express = require("express");
+const app = express();
 const cors = require("cors");
 
-const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
 
-app.use("/api/auth", require("./routes/auth"));
-app.use("/api/session", require("./routes/session"));
-app.use("/api/challenge", require("./routes/challenge"));
-app.use("/api/submission", require("./routes/submission"));
-app.use("/api/feedback", require("./routes/feedback"));
-app.use("/api/progress", require("./routes/progress"));
-app.use("/api/comment", require("./routes/comment"));
+// ROUTES
+const submissionRoute = require("./routes/submission");
+const challengeRoute = require("./routes/challenge");
+const feedbackRoute = require("./routes/feedback");
+const authRoute = require("./routes/auth");
+
+// USE ROUTES
+app.use("/api/submission", submissionRoute);
+app.use("/api/challenge", challengeRoute);
+app.use("/api/feedback", feedbackRoute);
+app.use("/api/auth", authRoute);
+
+// ✅ ROOT ROUTE FIX
 app.get("/", (req, res) => {
   res.send("Backend is running successfully 🚀");
 });
-app.listen(5000, () => console.log("Server running on 5000"));
+
+// START SERVER
+app.listen(5000, () => {
+  console.log("Server running on port 5000 🚀");
+});

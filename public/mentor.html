@@ -3,6 +3,8 @@
 <head>
 <title>Mentor Dashboard</title>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 body{
   margin:0;
@@ -22,6 +24,23 @@ nav{
   padding:20px;
 }
 
+/* STATS */
+.stats{
+  display:flex;
+  gap:20px;
+  margin-bottom:20px;
+}
+
+.stat{
+  flex:1;
+  background:white;
+  color:black;
+  padding:15px;
+  border-radius:10px;
+  text-align:center;
+}
+
+/* CARD */
 .card{
   background:white;
   color:black;
@@ -30,6 +49,20 @@ nav{
   margin-top:20px;
 }
 
+/* CHART FIX */
+.chart-box{
+  width:100%;
+  max-width:500px;
+  height:300px;
+  margin:auto;
+}
+
+.chart-box canvas{
+  width:100% !important;
+  height:100% !important;
+}
+
+/* INPUT */
 input, textarea{
   width:100%;
   padding:10px;
@@ -37,6 +70,7 @@ input, textarea{
   border-radius:8px;
 }
 
+/* BUTTON */
 button{
   margin-top:10px;
   padding:10px;
@@ -47,19 +81,17 @@ button{
   cursor:pointer;
 }
 
-button:hover{
-  background:#5a67d8;
-}
-
+/* LIST */
 .challenge{
-  margin-top:10px;
-  padding:10px;
   background:#f1f1f1;
+  padding:10px;
   border-radius:8px;
+  margin-top:10px;
 }
 </style>
 
 </head>
+
 <body>
 
 <nav>
@@ -69,103 +101,273 @@ button:hover{
 
 <div class="container">
 
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <h3>Total Challenges</h3>
+    <p id="totalC">0</p>
+  </div>
+
+  <div class="stat">
+    <h3>Total Submissions</h3>
+    <p id="totalS">0</p>
+  </div>
+</div>
+
+<!-- CHARTS -->
 <div class="card">
-<h3>Create Weekly Challenge</h3>
-
-<input type="text" id="title" placeholder="Challenge Title">
-<textarea id="desc" placeholder="Description"></textarea>
-<input type="date" id="deadline">
-
-<button onclick="createChallenge()">Create Challenge</button>
+  <h3>📊 Progress Overview</h3>
+  <div class="chart-box">
+    <canvas id="myChart"></canvas>
+  </div>
 </div>
 
 <div class="card">
-<h3>Created Challenges</h3>
-<div id="list">Loading...</div>
+  <h3>📈 Submissions Over Time</h3>
+  <div class="chart-box">
+    <canvas id="lineChart"></canvas>
+  </div>
+</div>
+
+<div class="card">
+  <h3>📊 Challenge Performance</h3>
+  <div class="chart-box">
+    <canvas id="barChart"></canvas>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="card">
+  <h3>🏆 Leaderboard</h3>
+  <div id="leaderboard">Loading...</div>
+</div>
+
+<!-- CREATE -->
+<div class="card">
+  <h3>Create Challenge</h3>
+  <input id="title" placeholder="Title">
+  <textarea id="desc" placeholder="Description"></textarea>
+  <input type="date" id="deadline">
+  <button onclick="createChallenge()">Create</button>
+</div>
+
+<!-- LIST -->
+<div class="card">
+  <h3>Challenges</h3>
+  <div id="list">Loading...</div>
+</div>
+
+<!-- SUBMISSIONS -->
+<div class="card">
+  <h3>Submissions</h3>
+  <div id="submissions">Loading...</div>
+</div>
+
+<!-- REPORT -->
+<div class="card">
+  <button onclick="downloadReport()">Download Report</button>
 </div>
 
 </div>
 
 <script>
 
+// 🔐 PROTECT PAGE
+const userData = JSON.parse(localStorage.getItem("user"));
+if(!userData) window.location.href="index.html";
+
+let chart, lineChart, barChart;
+
 // LOAD CHALLENGES
-function loadChallenges() {
+function loadChallenges(){
  fetch("http://localhost:5000/api/challenge/all")
- .then(res => res.json())
- .then(data => {
+ .then(res=>res.json())
+ .then(data=>{
+   document.getElementById("totalC").innerText=data.length;
 
-   let html = "";
+   let html="";
+   data.forEach(c=>{
+     html+=`<div class="challenge">📌 ${c.title}</div>`;
+   });
 
-   if(data.length === 0){
-     html = "<p>No challenges yet 😢</p>";
-   } else {
-     data.forEach(item => {
-       html += `
-         <div class="challenge">
-           📌 ${item.title} <br>
-           <small>${item.deadline || "No deadline"}</small>
-         </div>
-       `;
-     });
+   document.getElementById("list").innerHTML=html;
+ });
+}
+
+// LOAD SUBMISSIONS
+function loadSubmissions(){
+ fetch("http://localhost:5000/api/submission")
+ .then(res=>res.json())
+ .then(data=>{
+
+   document.getElementById("totalS").innerText=data.length;
+
+   loadChart(data);
+   loadLineChart(data);
+   loadBarChart(data);
+
+   let html="";
+   data.forEach(s=>{
+     html+=`
+      <div class="challenge">
+        <b>Challenge:</b> ${s.challenge_id}<br>
+        <b>Answer:</b> ${s.answer}<br>
+        <b>Status:</b> ${s.status}<br>
+
+        <textarea id="fb${s.id}"></textarea>
+        <button onclick="giveFeedback(${s.id})">Send</button>
+      </div>
+     `;
+   });
+
+   document.getElementById("submissions").innerHTML=html;
+ });
+}
+
+// DOUGHNUT
+function loadChart(data){
+
+ let p=0,r=0;
+ data.forEach(s=>{
+   s.status==="reviewed"?r++:p++;
+ });
+
+ if(chart) chart.destroy();
+
+ chart=new Chart(document.getElementById("myChart"),{
+   type:'doughnut',
+   data:{
+     labels:['Reviewed','Pending'],
+     datasets:[{data:[r,p]}]
+   },
+   options:{
+     responsive:true,
+     maintainAspectRatio:false
    }
-
-   document.getElementById("list").innerHTML = html;
  });
 }
 
+// LINE
+function loadLineChart(data){
 
-// CREATE CHALLENGE
-function createChallenge() {
+ const map={};
+ data.forEach(s=>{
+   const d=new Date(s.id*10000000).toLocaleDateString();
+   map[d]=(map[d]||0)+1;
+ });
 
- const userData = JSON.parse(localStorage.getItem("user"));
+ if(lineChart) lineChart.destroy();
 
- if(!userData){
-   alert("Please login first");
-   return;
- }
-
- const user = userData.user;
-
- const title = document.getElementById("title").value;
- const desc = document.getElementById("desc").value;
- const deadline = document.getElementById("deadline").value;
-
- if(!title || !desc){
-   alert("Please fill all fields");
-   return;
- }
-
- fetch("http://localhost:5000/api/challenge/create", {
-   method:"POST",
-   headers: {"Content-Type":"application/json"},
-   body: JSON.stringify({
-     mentor_id: user.id,
-     title,
-     description: desc,
-     deadline
-   })
- })
- .then(res => res.json())
- .then(data => {
-   alert("Challenge Created ✅");
-   loadChallenges();
- })
- .catch(err => {
-   console.log(err);
-   alert("Error ❌");
+ lineChart=new Chart(document.getElementById("lineChart"),{
+   type:'line',
+   data:{
+     labels:Object.keys(map),
+     datasets:[{data:Object.values(map)}]
+   },
+   options:{
+     responsive:true,
+     maintainAspectRatio:false
+   }
  });
 }
 
+// BAR
+function loadBarChart(data){
+
+ const map={};
+ data.forEach(s=>{
+   map[s.challenge_id]=(map[s.challenge_id]||0)+1;
+ });
+
+ if(barChart) barChart.destroy();
+
+ barChart=new Chart(document.getElementById("barChart"),{
+   type:'bar',
+   data:{
+     labels:Object.keys(map),
+     datasets:[{data:Object.values(map)}]
+   },
+   options:{
+     responsive:true,
+     maintainAspectRatio:false
+   }
+ });
+}
+
+// FEEDBACK
+function giveFeedback(id){
+ const comment=document.getElementById("fb"+id).value;
+
+ fetch("http://localhost:5000/api/feedback",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    submission_id:id,
+    comment,
+    score:5
+  })
+ }).then(()=>loadSubmissions());
+}
+
+// CREATE
+function createChallenge(){
+ const user=userData.user;
+
+ fetch("http://localhost:5000/api/challenge/create",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    mentor_id:user.id,
+    title:title.value,
+    description:desc.value,
+    deadline:deadline.value
+  })
+ }).then(()=>loadChallenges());
+}
+
+// LEADERBOARD
+function loadLeaderboard(){
+ fetch("http://localhost:5000/api/progress/leaderboard")
+ .then(res=>res.json())
+ .then(data=>{
+  let html="";
+  data.forEach((u,i)=>{
+    html+=`<p>Rank ${i+1} → User ${u.mentee_id} (${u.total})</p>`;
+  });
+  document.getElementById("leaderboard").innerHTML=html;
+ });
+}
+
+// REPORT
+function downloadReport(){
+ fetch("http://localhost:5000/api/submission")
+ .then(res=>res.json())
+ .then(data=>{
+  let text="Report\n\n";
+  data.forEach(s=>{
+    text+=`Challenge ${s.challenge_id} → ${s.status}\n`;
+  });
+
+  const blob=new Blob([text]);
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="report.txt";
+  a.click();
+ });
+}
 
 // LOGOUT
 function logout(){
-  localStorage.removeItem("user");
-  window.location.href = "index.html";
+ localStorage.removeItem("user");
+ window.location.href="index.html";
 }
 
-
 // INIT
-loadChallenges();
+window.onload=()=>{
+ loadChallenges();
+ loadSubmissions();
+ loadLeaderboard();
+};
 
 </script>
 

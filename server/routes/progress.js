@@ -1,15 +1,22 @@
 const router = require("express").Router();
 const db = require("../db");
 
-router.get("/:mentee_id", async (req, res) => {
-  const { mentee_id } = req.params;
+// LEADERBOARD API
+router.get("/leaderboard", async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT mentee_id, COUNT(*) as total
+      FROM submissions
+      GROUP BY mentee_id
+      ORDER BY total DESC
+    `);
 
-  const result = await db.query(
-    "SELECT * FROM progress WHERE mentee_id=$1",
-    [mentee_id]
-  );
+    res.json(result.rows);
 
-  res.json(result.rows[0]);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 module.exports = router;
