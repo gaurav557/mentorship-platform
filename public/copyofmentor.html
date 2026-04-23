@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mentor Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:'Poppins', sans-serif;
+  background:linear-gradient(135deg,#1f1c2c,#928dab);
+  color:white;
+}
+
+/* NAV */
+nav{
+  display:flex;
+  justify-content:space-between;
+  padding:15px 30px;
+  background:rgba(0,0,0,0.4);
+  backdrop-filter:blur(10px);
+}
+
+/* CONTAINER */
+.container{
+  padding:20px;
+}
+
+/* STATS */
+.stats{
+  display:flex;
+  gap:20px;
+}
+
+.stat{
+  flex:1;
+  background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+  padding:15px;
+  border-radius:15px;
+  text-align:center;
+  color:black;
+  font-weight:bold;
+}
+
+/* CARD */
+.card{
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.2);
+  box-shadow:0 8px 25px rgba(0,0,0,0.3);
+  padding:20px;
+  border-radius:15px;
+  margin-top:20px;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:translateY(-5px) scale(1.01);
+}
+
+/* CHART */
+.chart-box{
+  width:100%;
+  max-width:500px;
+  height:280px;
+  margin:auto;
+}
+
+/* INPUT */
+input, textarea{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+  border:none;
+  background:rgba(255,255,255,0.1);
+  color:white;
+}
+
+/* BUTTON */
+button{
+  margin-top:10px;
+  padding:10px;
+  background:linear-gradient(135deg,#ff758c,#ff7eb3);
+  color:white;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+/* LIST */
+.challenge{
+  background:rgba(255,255,255,0.08);
+  padding:12px;
+  border-radius:10px;
+  margin-top:10px;
+}
+
+/* LEADERBOARD */
+.leader{
+  background:linear-gradient(135deg,#43e97b,#38f9d7);
+  padding:12px;
+  border-radius:10px;
+  margin-top:10px;
+  display:flex;
+  justify-content:space-between;
+  color:black;
+  font-weight:bold;
+}
+</style>
+
+</head>
+
+<body>
+
+<nav>
+  <h2>👨‍🏫 Mentor Dashboard</h2>
+  <button onclick="logout()">Logout</button>
+</nav>
+
+<div class="container">
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <h3>Total Challenges</h3>
+    <p id="totalC">0</p>
+  </div>
+  <div class="stat">
+    <h3>Total Submissions</h3>
+    <p id="totalS">0</p>
+  </div>
+</div>
+
+<!-- CHARTS -->
+<div class="card">
+  <h3>📊 Progress Overview</h3>
+  <div class="chart-box"><canvas id="myChart"></canvas></div>
+</div>
+
+<div class="card">
+  <h3>📈 Submissions Over Time</h3>
+  <div class="chart-box"><canvas id="lineChart"></canvas></div>
+</div>
+
+<div class="card">
+  <h3>📊 Challenge Performance</h3>
+  <div class="chart-box"><canvas id="barChart"></canvas></div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="card">
+  <h3>🏆 Leaderboard</h3>
+  <div id="leaderboard">Loading...</div>
+</div>
+
+<!-- CREATE -->
+<div class="card">
+  <h3>Create Challenge</h3>
+  <input id="title" placeholder="Title">
+  <textarea id="desc" placeholder="Description"></textarea>
+  <input type="date" id="deadline">
+  <button onclick="createChallenge()">Create</button>
+</div>
+
+<!-- CHALLENGES -->
+<div class="card">
+  <h3>Challenges</h3>
+  <div id="list">Loading...</div>
+</div>
+
+<!-- SUBMISSIONS -->
+<div class="card">
+  <h3>Submissions</h3>
+  <div id="submissions">Loading...</div>
+</div>
+
+</div>
+
+<script>
+
+const userData = JSON.parse(localStorage.getItem("user"));
+if(!userData) window.location.href="index.html";
+
+let chart, lineChart, barChart;
+
+/* LOAD CHALLENGES */
+function loadChallenges(){
+ fetch("http://localhost:5000/api/challenge/all")
+ .then(res=>res.json())
+ .then(data=>{
+   document.getElementById("totalC").innerText=data.length;
+
+   let html="";
+   data.forEach(c=>{
+     html+=`<div class="challenge">📌 ${c.title}</div>`;
+   });
+
+   document.getElementById("list").innerHTML=html;
+ });
+}
+
+/* LOAD SUBMISSIONS */
+function loadSubmissions(){
+ fetch("http://localhost:5000/api/submission")
+ .then(res=>res.json())
+ .then(data=>{
+
+   document.getElementById("totalS").innerText=data.length;
+
+   loadChart(data);
+   loadLineChart(data);
+   loadBarChart(data);
+
+   let html="";
+   data.forEach(s=>{
+     html+=`
+      <div class="challenge">
+        <b>Challenge:</b> ${s.challenge_id}<br>
+        <b>Answer:</b> ${s.answer}<br>
+        <b>Status:</b> ${s.status}<br>
+
+        <textarea id="fb${s.id}" placeholder="Write feedback..."></textarea>
+        <button onclick="giveFeedback(${s.id})">Send Feedback</button>
+      </div>
+     `;
+   });
+
+   document.getElementById("submissions").innerHTML=html;
+ });
+}
+
+/* DOUGHNUT */
+function loadChart(data){
+ let p=0,r=0;
+ data.forEach(s=> s.status==="reviewed"?r++:p++);
+
+ if(chart) chart.destroy();
+
+ chart=new Chart(document.getElementById("myChart"),{
+   type:'doughnut',
+   data:{
+     labels:['Reviewed','Pending'],
+     datasets:[{
+       data:[r,p],
+       backgroundColor:["#00f5d4","#ff4d6d"]
+     }]
+   },
+   options:{
+     plugins:{ legend:{ labels:{color:"#fff"} } }
+   }
+ });
+}
+
+/* LINE */
+function loadLineChart(data){
+ const map={};
+ data.forEach(()=>{
+   const d=new Date().toLocaleDateString();
+   map[d]=(map[d]||0)+1;
+ });
+
+ if(lineChart) lineChart.destroy();
+
+ lineChart=new Chart(document.getElementById("lineChart"),{
+   type:'line',
+   data:{
+     labels:Object.keys(map),
+     datasets:[{
+       label:"Daily Submissions",
+       data:Object.values(map),
+       borderColor:"#00f5d4",
+       backgroundColor:"rgba(0,245,212,0.2)",
+       fill:true,
+       tension:0.4
+     }]
+   },
+   options:{
+     plugins:{ legend:{ labels:{color:"#fff"} } },
+     scales:{
+       x:{ ticks:{color:"#fff"} },
+       y:{ ticks:{color:"#fff"} }
+     }
+   }
+ });
+}
+
+/* BAR */
+function loadBarChart(data){
+ const map={};
+ data.forEach(s=>{
+   map[s.challenge_id]=(map[s.challenge_id]||0)+1;
+ });
+
+ if(barChart) barChart.destroy();
+
+ barChart=new Chart(document.getElementById("barChart"),{
+   type:'bar',
+   data:{
+     labels:Object.keys(map),
+     datasets:[{
+       label:"Submissions",
+       data:Object.values(map),
+       backgroundColor:[
+         "#00f5d4",
+         "#ff4d6d",
+         "#ffd166",
+         "#8338ec",
+         "#3a86ff"
+       ],
+       borderRadius:10
+     }]
+   },
+   options:{
+     plugins:{ legend:{ labels:{color:"#fff"} } },
+     scales:{
+       x:{ ticks:{color:"#fff"} },
+       y:{ ticks:{color:"#fff"} }
+     }
+   }
+ });
+}
+
+/* LEADERBOARD */
+function loadLeaderboard(){
+ fetch("http://localhost:5000/api/progress")
+ .then(res=>res.json())
+ .then(data=>{
+  let html="";
+  data.forEach((u,i)=>{
+    html+=`
+      <div class="leader">
+        <span>🏆 Rank ${i+1}</span>
+        <span>User ${u.mentee_id}</span>
+        <span>${u.total_submissions}</span>
+      </div>
+    `;
+  });
+  document.getElementById("leaderboard").innerHTML=html;
+ });
+}
+
+/* FEEDBACK */
+function giveFeedback(id){
+ const comment=document.getElementById("fb"+id).value;
+
+ fetch("http://localhost:5000/api/feedback",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({submission_id:id,comment,score:5})
+ }).then(()=>{
+   alert("Feedback sent ✅");
+   loadSubmissions();
+ });
+}
+
+/* CREATE */
+function createChallenge(){
+ const user=userData.user;
+
+ fetch("http://localhost:5000/api/challenge/create",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    mentor_id:user.id,
+    title:title.value,
+    description:desc.value,
+    deadline:deadline.value
+  })
+ }).then(()=>{
+   alert("Challenge created ✅");
+   loadChallenges();
+ });
+}
+
+/* LOGOUT */
+function logout(){
+ localStorage.removeItem("user");
+ window.location.href="index.html";
+}
+
+/* INIT */
+window.onload=()=>{
+ loadChallenges();
+ loadSubmissions();
+ loadLeaderboard();
+};
+
+</script>
+</body>
+</html>

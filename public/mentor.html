@@ -1,375 +1,683 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mentor Dashboard</title>
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:linear-gradient(135deg,#667eea,#764ba2);
-  color:white;
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-nav{
-  display:flex;
-  justify-content:space-between;
-  padding:15px 30px;
-  background:rgba(0,0,0,0.3);
-}
+  :root {
+    --bg:          #0f0e17;
+    --surface:     #1a1828;
+    --surface2:    #221f35;
+    --border:      rgba(255,255,255,0.08);
+    --border2:     rgba(255,255,255,0.14);
 
-.container{
-  padding:20px;
-}
+    --purple:      #7c6ff7;
+    --purple-soft: rgba(124,111,247,0.15);
+    --teal:        #2dd4bf;
+    --teal-soft:   rgba(45,212,191,0.15);
+    --amber:       #fbbf24;
+    --amber-soft:  rgba(251,191,36,0.15);
+    --red:         #f87171;
+    --red-soft:    rgba(248,113,113,0.15);
+    --green:       #4ade80;
+    --green-soft:  rgba(74,222,128,0.15);
 
-/* STATS */
-.stats{
-  display:flex;
-  gap:20px;
-  margin-bottom:20px;
-}
+    --text:        #e8e6f0;
+    --text-muted:  #8b879e;
+    --text-faint:  #4f4c60;
 
-.stat{
-  flex:1;
-  background:white;
-  color:black;
-  padding:15px;
-  border-radius:10px;
-  text-align:center;
-}
+    --radius:      14px;
+    --radius-sm:   9px;
+  }
 
-/* CARD */
-.card{
-  background:white;
-  color:black;
-  padding:20px;
-  border-radius:10px;
-  margin-top:20px;
-}
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
 
-/* CHART FIX */
-.chart-box{
-  width:100%;
-  max-width:500px;
-  height:300px;
-  margin:auto;
-}
+  /* ── NAV ──────────────────────────────── */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 32px;
+    height: 64px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
 
-.chart-box canvas{
-  width:100% !important;
-  height:100% !important;
-}
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
 
-/* INPUT */
-input, textarea{
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  border-radius:8px;
-}
+  .nav-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--purple-soft);
+    border: 1px solid rgba(124,111,247,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
 
-/* BUTTON */
-button{
-  margin-top:10px;
-  padding:10px;
-  background:#667eea;
-  color:white;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
 
-/* LIST */
-.challenge{
-  background:#f1f1f1;
-  padding:10px;
-  border-radius:8px;
-  margin-top:10px;
-}
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c6ff7, #a78bfa);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+  }
+
+  .btn-logout {
+    padding: 7px 16px;
+    background: transparent;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-logout:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+
+  /* ── LAYOUT ───────────────────────────── */
+  .page { max-width: 1100px; margin: 0 auto; padding: 32px 24px 60px; }
+
+  .page-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.4px;
+    margin-bottom: 4px;
+  }
+  .page-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; }
+
+  /* ── STAT CARDS ───────────────────────── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color 0.2s;
+  }
+  .stat:hover { border-color: var(--border2); }
+
+  .stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .stat-icon.purple { background: var(--purple-soft); }
+  .stat-icon.teal   { background: var(--teal-soft);   }
+  .stat-icon.amber  { background: var(--amber-soft);  }
+  .stat-icon.green  { background: var(--green-soft);  }
+
+  .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+
+  /* ── GRID ─────────────────────────────── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+  /* ── CARD ─────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-purple { background: var(--purple); }
+  .dot-teal   { background: var(--teal);   }
+  .dot-amber  { background: var(--amber);  }
+
+  .chart-wrap { height: 230px; position: relative; }
+
+  /* ── FORM ─────────────────────────────── */
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 12px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 7px; display: block; }
+
+  .form-input, .form-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  .form-input:focus, .form-textarea:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(124,111,247,0.15);
+  }
+  .form-textarea { resize: vertical; min-height: 90px; }
+
+  .btn-primary {
+    padding: 10px 22px;
+    background: var(--purple);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: white;
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    margin-top: 4px;
+  }
+  .btn-primary:hover { background: #6a5ef0; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  /* ── CHALLENGE ITEM ───────────────────── */
+  .challenge-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+    transition: border-color 0.2s;
+  }
+  .challenge-item:hover { border-color: rgba(124,111,247,0.3); }
+  .challenge-item:last-child { margin-bottom: 0; }
+
+  .challenge-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--purple);
+    flex-shrink: 0;
+  }
+
+  .challenge-title { font-size: 14px; font-weight: 500; color: var(--text); }
+  .challenge-meta  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── SUBMISSION ITEM ──────────────────── */
+  .sub-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .sub-item:last-child { margin-bottom: 0; }
+
+  .sub-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .sub-name   { font-size: 14px; font-weight: 600; color: var(--text); }
+  .sub-cid    { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .sub-answer { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5; }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: capitalize;
+    letter-spacing: 0.3px;
+  }
+  .badge-pending  { background: var(--amber-soft); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .badge-reviewed { background: var(--green-soft);  color: var(--green);  border: 1px solid rgba(74,222,128,0.2); }
+
+  .fb-row { display: flex; gap: 8px; margin-top: 8px; }
+
+  .fb-input {
+    flex: 1;
+    padding: 8px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .fb-input:focus { border-color: var(--teal); }
+
+  .btn-fb {
+    padding: 8px 16px;
+    background: var(--teal-soft);
+    border: 1px solid rgba(45,212,191,0.25);
+    border-radius: var(--radius-sm);
+    color: var(--teal);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .btn-fb:hover { background: rgba(45,212,191,0.25); }
+
+  /* ── LEADERBOARD ──────────────────────── */
+  .leader-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    transition: background 0.2s;
+  }
+  .leader-item:hover { background: var(--surface2); }
+  .leader-item:last-child { margin-bottom: 0; }
+
+  .rank-badge {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .rank-1 { background: var(--amber-soft); color: var(--amber); }
+  .rank-2 { background: rgba(192,192,192,0.15); color: #b0b0b0; }
+  .rank-3 { background: rgba(205,127,50,0.15);  color: #cd7f32; }
+  .rank-n { background: var(--surface2); color: var(--text-muted); }
+
+  .leader-name    { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
+  .leader-score   { font-size: 13px; font-weight: 600; color: var(--purple); background: var(--purple-soft); padding: 3px 10px; border-radius: 20px; }
+
+  /* ── DIVIDER ──────────────────────────── */
+  .section-gap { margin-bottom: 20px; }
+
+  /* ── EMPTY / LOADING STATE ────────────── */
+  .empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--text-faint);
+    font-size: 13px;
+  }
 </style>
-
 </head>
-
 <body>
 
+<!-- NAV -->
 <nav>
-  <h2>👨‍🏫 Mentor Dashboard</h2>
-  <button onclick="logout()">Logout</button>
+  <div class="nav-brand">
+    <div class="nav-icon">&#127979;</div>
+    Mentor Dashboard
+  </div>
+  <div class="nav-right">
+    <div class="avatar">M</div>
+    <button class="btn-logout" onclick="logout()">Sign out</button>
+  </div>
 </nav>
 
-<div class="container">
+<div class="page">
 
-<!-- STATS -->
-<div class="stats">
-  <div class="stat">
-    <h3>Total Challenges</h3>
-    <p id="totalC">0</p>
+  <p class="page-title">Overview</p>
+  <p class="page-sub">Track challenges, submissions, and mentee progress</p>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-icon purple">&#128196;</div>
+      <div>
+        <div class="stat-label">Challenges</div>
+        <div class="stat-value" id="totalC">0</div>
+      </div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon teal">&#128228;</div>
+      <div>
+        <div class="stat-label">Submissions</div>
+        <div class="stat-value" id="totalS">0</div>
+      </div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon amber">&#9989;</div>
+      <div>
+        <div class="stat-label">Reviewed</div>
+        <div class="stat-value" id="totalR">0</div>
+      </div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon green">&#127942;</div>
+      <div>
+        <div class="stat-label">Mentees</div>
+        <div class="stat-value" id="totalM">—</div>
+      </div>
+    </div>
   </div>
 
-  <div class="stat">
-    <h3>Total Submissions</h3>
-    <p id="totalS">0</p>
+  <!-- CHARTS ROW -->
+  <div class="grid-3 section-gap">
+    <div class="card">
+      <div class="card-title"><span class="card-title-dot dot-purple"></span>Status split</div>
+      <div class="chart-wrap"><canvas id="myChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="card-title-dot dot-teal"></span>Submissions over time</div>
+      <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="card-title-dot dot-amber"></span>Per challenge</div>
+      <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+    </div>
   </div>
-</div>
 
-<!-- CHARTS -->
-<div class="card">
-  <h3>📊 Progress Overview</h3>
-  <div class="chart-box">
-    <canvas id="myChart"></canvas>
+  <!-- LEADERBOARD + CREATE -->
+  <div class="grid-2 section-gap">
+
+    <div class="card">
+      <div class="card-title"><span class="card-title-dot dot-amber"></span>Leaderboard</div>
+      <div id="leaderboard"><div class="empty-state">Loading...</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="card-title-dot dot-purple"></span>Create challenge</div>
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input class="form-input" id="title" placeholder="e.g. Build a REST API">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="desc" placeholder="What should mentees accomplish?"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Deadline</label>
+        <input class="form-input" type="date" id="deadline">
+      </div>
+      <button class="btn-primary" onclick="createChallenge()">Create challenge</button>
+    </div>
+
   </div>
-</div>
 
-<div class="card">
-  <h3>📈 Submissions Over Time</h3>
-  <div class="chart-box">
-    <canvas id="lineChart"></canvas>
+  <!-- CHALLENGES + SUBMISSIONS -->
+  <div class="grid-2">
+
+    <div class="card">
+      <div class="card-title"><span class="card-title-dot dot-purple"></span>Active challenges</div>
+      <div id="list"><div class="empty-state">Loading...</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="card-title-dot dot-teal"></span>Submissions</div>
+      <div id="submissions"><div class="empty-state">Loading...</div></div>
+    </div>
+
   </div>
-</div>
-
-<div class="card">
-  <h3>📊 Challenge Performance</h3>
-  <div class="chart-box">
-    <canvas id="barChart"></canvas>
-  </div>
-</div>
-
-<!-- LEADERBOARD -->
-<div class="card">
-  <h3>🏆 Leaderboard</h3>
-  <div id="leaderboard">Loading...</div>
-</div>
-
-<!-- CREATE -->
-<div class="card">
-  <h3>Create Challenge</h3>
-  <input id="title" placeholder="Title">
-  <textarea id="desc" placeholder="Description"></textarea>
-  <input type="date" id="deadline">
-  <button onclick="createChallenge()">Create</button>
-</div>
-
-<!-- LIST -->
-<div class="card">
-  <h3>Challenges</h3>
-  <div id="list">Loading...</div>
-</div>
-
-<!-- SUBMISSIONS -->
-<div class="card">
-  <h3>Submissions</h3>
-  <div id="submissions">Loading...</div>
-</div>
-
-<!-- REPORT -->
-<div class="card">
-  <button onclick="downloadReport()">Download Report</button>
-</div>
 
 </div>
 
 <script>
-
-// 🔐 PROTECT PAGE
 const userData = JSON.parse(localStorage.getItem("user"));
-if(!userData) window.location.href="index.html";
+if (!userData) window.location.href = "index.html";
 
 let chart, lineChart, barChart;
 
-// LOAD CHALLENGES
-function loadChallenges(){
- fetch("http://localhost:5000/api/challenge/all")
- .then(res=>res.json())
- .then(data=>{
-   document.getElementById("totalC").innerText=data.length;
-
-   let html="";
-   data.forEach(c=>{
-     html+=`<div class="challenge">📌 ${c.title}</div>`;
-   });
-
-   document.getElementById("list").innerHTML=html;
- });
-}
-
-// LOAD SUBMISSIONS
-function loadSubmissions(){
- fetch("http://localhost:5000/api/submission")
- .then(res=>res.json())
- .then(data=>{
-
-   document.getElementById("totalS").innerText=data.length;
-
-   loadChart(data);
-   loadLineChart(data);
-   loadBarChart(data);
-
-   let html="";
-   data.forEach(s=>{
-     html+=`
-      <div class="challenge">
-        <b>Challenge:</b> ${s.challenge_id}<br>
-        <b>Answer:</b> ${s.answer}<br>
-        <b>Status:</b> ${s.status}<br>
-
-        <textarea id="fb${s.id}"></textarea>
-        <button onclick="giveFeedback(${s.id})">Send</button>
-      </div>
-     `;
-   });
-
-   document.getElementById("submissions").innerHTML=html;
- });
-}
-
-// DOUGHNUT
-function loadChart(data){
-
- let p=0,r=0;
- data.forEach(s=>{
-   s.status==="reviewed"?r++:p++;
- });
-
- if(chart) chart.destroy();
-
- chart=new Chart(document.getElementById("myChart"),{
-   type:'doughnut',
-   data:{
-     labels:['Reviewed','Pending'],
-     datasets:[{data:[r,p]}]
-   },
-   options:{
-     responsive:true,
-     maintainAspectRatio:false
-   }
- });
-}
-
-// LINE
-function loadLineChart(data){
-
- const map={};
- data.forEach(s=>{
-   const d=new Date(s.id*10000000).toLocaleDateString();
-   map[d]=(map[d]||0)+1;
- });
-
- if(lineChart) lineChart.destroy();
-
- lineChart=new Chart(document.getElementById("lineChart"),{
-   type:'line',
-   data:{
-     labels:Object.keys(map),
-     datasets:[{data:Object.values(map)}]
-   },
-   options:{
-     responsive:true,
-     maintainAspectRatio:false
-   }
- });
-}
-
-// BAR
-function loadBarChart(data){
-
- const map={};
- data.forEach(s=>{
-   map[s.challenge_id]=(map[s.challenge_id]||0)+1;
- });
-
- if(barChart) barChart.destroy();
-
- barChart=new Chart(document.getElementById("barChart"),{
-   type:'bar',
-   data:{
-     labels:Object.keys(map),
-     datasets:[{data:Object.values(map)}]
-   },
-   options:{
-     responsive:true,
-     maintainAspectRatio:false
-   }
- });
-}
-
-// FEEDBACK
-function giveFeedback(id){
- const comment=document.getElementById("fb"+id).value;
-
- fetch("http://localhost:5000/api/feedback",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({
-    submission_id:id,
-    comment,
-    score:5
-  })
- }).then(()=>loadSubmissions());
-}
-
-// CREATE
-function createChallenge(){
- const user=userData.user;
-
- fetch("http://localhost:5000/api/challenge/create",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({
-    mentor_id:user.id,
-    title:title.value,
-    description:desc.value,
-    deadline:deadline.value
-  })
- }).then(()=>loadChallenges());
-}
-
-// LEADERBOARD
-function loadLeaderboard(){
- fetch("http://localhost:5000/api/progress/leaderboard")
- .then(res=>res.json())
- .then(data=>{
-  let html="";
-  data.forEach((u,i)=>{
-    html+=`<p>Rank ${i+1} → User ${u.mentee_id} (${u.total})</p>`;
-  });
-  document.getElementById("leaderboard").innerHTML=html;
- });
-}
-
-// REPORT
-function downloadReport(){
- fetch("http://localhost:5000/api/submission")
- .then(res=>res.json())
- .then(data=>{
-  let text="Report\n\n";
-  data.forEach(s=>{
-    text+=`Challenge ${s.challenge_id} → ${s.status}\n`;
-  });
-
-  const blob=new Blob([text]);
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="report.txt";
-  a.click();
- });
-}
-
-// LOGOUT
-function logout(){
- localStorage.removeItem("user");
- window.location.href="index.html";
-}
-
-// INIT
-window.onload=()=>{
- loadChallenges();
- loadSubmissions();
- loadLeaderboard();
+const chartDefaults = {
+  plugins: { legend: { labels: { color: "#8b879e", font: { family: "Inter", size: 12 } } } },
+  scales: {
+    x: { ticks: { color: "#8b879e", font: { family: "Inter", size: 11 } }, grid: { color: "rgba(255,255,255,0.04)" } },
+    y: { ticks: { color: "#8b879e", font: { family: "Inter", size: 11 } }, grid: { color: "rgba(255,255,255,0.04)" } }
+  }
 };
 
-</script>
+function loadChallenges() {
+  fetch("http://localhost:5000/api/challenge/all")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("totalC").innerText = data.length;
+      if (!data.length) {
+        document.getElementById("list").innerHTML = '<div class="empty-state">No challenges yet</div>';
+        return;
+      }
+      document.getElementById("list").innerHTML = data.map(c => `
+        <div class="challenge-item">
+          <div class="challenge-dot"></div>
+          <div>
+            <div class="challenge-title">${c.title}</div>
+            <div class="challenge-meta">${c.deadline ? "Due " + new Date(c.deadline).toLocaleDateString("en-US", {month:"short",day:"numeric"}) : "No deadline"}</div>
+          </div>
+        </div>
+      `).join("");
+    }).catch(() => {
+      document.getElementById("list").innerHTML = '<div class="empty-state">Could not load challenges</div>';
+    });
+}
 
+function loadSubmissions() {
+  fetch("http://localhost:5000/api/submission")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("totalS").innerText = data.length;
+      const reviewed = data.filter(s => s.status === "reviewed").length;
+      document.getElementById("totalR").innerText = reviewed;
+
+      loadChart(data);
+      loadLineChart(data);
+      loadBarChart(data);
+
+      if (!data.length) {
+        document.getElementById("submissions").innerHTML = '<div class="empty-state">No submissions yet</div>';
+        return;
+      }
+
+      document.getElementById("submissions").innerHTML = data.map(s => `
+        <div class="sub-item">
+          <div class="sub-header">
+            <div>
+              <div class="sub-name">Challenge #${s.challenge_id}</div>
+              <div class="sub-cid">Mentee ${s.mentee_id || s.id}</div>
+            </div>
+            <span class="badge ${s.status === 'reviewed' ? 'badge-reviewed' : 'badge-pending'}">${s.status || 'pending'}</span>
+          </div>
+          <div class="sub-answer">${s.answer}</div>
+          <div class="fb-row">
+            <input class="fb-input" id="fb${s.id}" placeholder="Write feedback...">
+            <button class="btn-fb" onclick="giveFeedback(${s.id})">Send</button>
+          </div>
+        </div>
+      `).join("");
+    }).catch(() => {
+      document.getElementById("submissions").innerHTML = '<div class="empty-state">Could not load submissions</div>';
+    });
+}
+
+function loadChart(data) {
+  let p = 0, r = 0;
+  data.forEach(s => s.status === "reviewed" ? r++ : p++);
+  if (chart) chart.destroy();
+  chart = new Chart(document.getElementById("myChart"), {
+    type: "doughnut",
+    data: {
+      labels: ["Reviewed", "Pending"],
+      datasets: [{ data: [r, p], backgroundColor: ["#2dd4bf", "#f87171"], borderWidth: 0, hoverOffset: 6 }]
+    },
+    options: {
+      cutout: "68%",
+      plugins: { legend: { position: "bottom", labels: { color: "#8b879e", font: { family: "Inter", size: 12 }, padding: 16 } } }
+    }
+  });
+}
+
+function loadLineChart(data) {
+  const map = {};
+  data.forEach(() => {
+    const d = new Date().toLocaleDateString();
+    map[d] = (map[d] || 0) + 1;
+  });
+  if (lineChart) lineChart.destroy();
+  lineChart = new Chart(document.getElementById("lineChart"), {
+    type: "line",
+    data: {
+      labels: Object.keys(map),
+      datasets: [{
+        label: "Submissions",
+        data: Object.values(map),
+        borderColor: "#7c6ff7",
+        backgroundColor: "rgba(124,111,247,0.12)",
+        fill: true, tension: 0.4, pointRadius: 4,
+        pointBackgroundColor: "#7c6ff7"
+      }]
+    },
+    options: { ...chartDefaults, plugins: { legend: { display: false } } }
+  });
+}
+
+function loadBarChart(data) {
+  const map = {};
+  data.forEach(s => { map[s.challenge_id] = (map[s.challenge_id] || 0) + 1; });
+  if (barChart) barChart.destroy();
+  barChart = new Chart(document.getElementById("barChart"), {
+    type: "bar",
+    data: {
+      labels: Object.keys(map).map(k => "C-" + k),
+      datasets: [{
+        label: "Submissions",
+        data: Object.values(map),
+        backgroundColor: "rgba(124,111,247,0.7)",
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: { ...chartDefaults, plugins: { legend: { display: false } } }
+  });
+}
+
+function loadLeaderboard() {
+  fetch("http://localhost:5000/api/progress")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("totalM").innerText = data.length;
+      if (!data.length) {
+        document.getElementById("leaderboard").innerHTML = '<div class="empty-state">No data yet</div>';
+        return;
+      }
+      document.getElementById("leaderboard").innerHTML = data.map((u, i) => {
+        const rankClass = i === 0 ? "rank-1" : i === 1 ? "rank-2" : i === 2 ? "rank-3" : "rank-n";
+        return `
+          <div class="leader-item">
+            <div class="rank-badge ${rankClass}">${i + 1}</div>
+            <div class="leader-name">Mentee ${u.mentee_id}</div>
+            <div class="leader-score">${u.total_submissions} pts</div>
+          </div>
+        `;
+      }).join("");
+    }).catch(() => {
+      document.getElementById("leaderboard").innerHTML = '<div class="empty-state">Could not load leaderboard</div>';
+    });
+}
+
+function giveFeedback(id) {
+  const comment = document.getElementById("fb" + id).value;
+  if (!comment.trim()) return alert("Please write feedback first.");
+  fetch("http://localhost:5000/api/feedback", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ submission_id: id, comment, score: 5 })
+  }).then(() => {
+    alert("Feedback sent ✅");
+    loadSubmissions();
+  });
+}
+
+function createChallenge() {
+  const user = userData.user;
+  const titleVal = document.getElementById("title").value.trim();
+  if (!titleVal) return alert("Please enter a title.");
+  fetch("http://localhost:5000/api/challenge/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      mentor_id: user.id,
+      title: titleVal,
+      description: document.getElementById("desc").value,
+      deadline: document.getElementById("deadline").value
+    })
+  }).then(() => {
+    alert("Challenge created ✅");
+    document.getElementById("title").value = "";
+    document.getElementById("desc").value = "";
+    document.getElementById("deadline").value = "";
+    loadChallenges();
+  });
+}
+
+function logout() {
+  localStorage.removeItem("user");
+  window.location.href = "index.html";
+}
+
+window.onload = () => {
+  loadChallenges();
+  loadSubmissions();
+  loadLeaderboard();
+};
+</script>
 </body>
 </html>

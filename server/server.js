@@ -10,14 +10,16 @@ const submissionRoute = require("./routes/submission");
 const challengeRoute = require("./routes/challenge");
 const feedbackRoute = require("./routes/feedback");
 const authRoute = require("./routes/auth");
+const progressRoute = require("./routes/progress");
 
 // USE ROUTES
 app.use("/api/submission", submissionRoute);
 app.use("/api/challenge", challengeRoute);
 app.use("/api/feedback", feedbackRoute);
 app.use("/api/auth", authRoute);
+app.use("/api/progress", progressRoute);
 
-// ✅ ROOT ROUTE FIX
+// ROOT ROUTE
 app.get("/", (req, res) => {
   res.send("Backend is running successfully 🚀");
 });
