@@ -2,7 +2,7 @@ const router = require("express").Router();
 const db = require("../db");
 
 
-// ✅ GET ALL SUBMISSIONS WITH FEEDBACK (JOIN)
+// GET ALL SUBMISSIONS WITH FEEDBACK (JOIN)
 router.get("/", async (req, res) => {
   try {
     const result = await db.query(`
@@ -29,7 +29,7 @@ router.get("/", async (req, res) => {
 });
 
 
-// ✅ CREATE SUBMISSION
+//CREATE SUBMISSION
 router.post("/", async (req, res) => {
   try {
     const { challenge_id, mentee_id, answer } = req.body;
@@ -52,5 +52,5 @@ router.post("/", async (req, res) => {
 });
 
 
-// ✅ EXPORT ROUTER (MOST IMPORTANT LINE)
+// EXPORT ROUTER
 module.exports = router;

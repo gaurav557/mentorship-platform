@@ -277,13 +277,13 @@ function login(){
  .then(data=>{
 
   if(!data.user){
-    alert("Login failed ❌");
+    alert("Login failed ");
     return;
   }
 
-  // 🔥 MAIN FIX HERE
+  //  MAIN FIX HERE
   if(data.user.role !== role){
-    alert("❌ Wrong role selected!\nPlease select correct login type.");
+    alert(" Wrong role selected!\nPlease select correct login type.");
     return;
   }
 
@@ -296,7 +296,7 @@ function login(){
   }
 
  })
- .catch(()=>alert("Server error ❌"));
+ .catch(()=>alert("Server error "));
 }
 </script>
 

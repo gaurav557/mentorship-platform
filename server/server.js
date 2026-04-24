@@ -23,10 +23,10 @@ app.use("/api/progress", progressRoute);
 
 // ROOT ROUTE
 app.get("/", (req, res) => {
-  res.send("Backend is running successfully 🚀");
+  res.send("Backend is running successfully ");
 });
 
 // START SERVER
 app.listen(5000, () => {
-  console.log("Server running on port 5000 🚀");
+  console.log("Server running on port 5000 ");
 });
