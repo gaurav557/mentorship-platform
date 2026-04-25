@@ -267,6 +267,13 @@ if(!userData || userData.user.role !== "mentor"){
 let chart, lineChart, barChart;
 const ratings = {};
 
+function syncDashboard(){
+  loadSessions();
+  loadChallenges();
+  loadSubmissions();
+  loadLeaderboard();
+}
+
 function loadSessions() {
   const data = MentorStorage.getSessions();
   let options = '<option value="">Select Session</option>';
@@ -341,6 +348,7 @@ function loadSubmissions(){
   submissions.innerHTML = data.map((submission) => `
     <div class="submission-card">
       <p><b>Challenge ID:</b> ${submission.challenge_id}</p>
+      <p><b>Challenge:</b> ${(MentorStorage.getChallenges().find((challenge) => challenge.id === submission.challenge_id) || {}).title || "Unknown"}</p>
       <p><b>Answer:</b> ${submission.answer}</p>
       <p>
         <b>Status:</b>
@@ -512,11 +520,17 @@ function logout(){
 }
 
 window.onload = () => {
-  loadSessions();
-  loadChallenges();
-  loadSubmissions();
-  loadLeaderboard();
+  syncDashboard();
 };
+
+window.addEventListener("storage", syncDashboard);
+window.addEventListener("mentorhub:changed", syncDashboard);
+window.addEventListener("focus", syncDashboard);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    syncDashboard();
+  }
+});
 </script>
 
 </body>

@@ -170,6 +170,11 @@ if(!userData || userData.user.role !== "mentee"){
 const user = userData.user;
 let chart;
 
+function syncStudentView(){
+  loadChallenges();
+  loadHistory();
+}
+
 function showWelcome(){
   const hour = new Date().getHours();
   let msg = "Welcome";
@@ -217,7 +222,7 @@ function submit(id){
   });
 
   document.getElementById("ans" + id).value = "";
-  loadHistory();
+  syncStudentView();
 }
 
 function loadHistory(){
@@ -286,9 +291,17 @@ function logout(){
 
 window.onload = () => {
   showWelcome();
-  loadChallenges();
-  loadHistory();
+  syncStudentView();
 };
+
+window.addEventListener("storage", syncStudentView);
+window.addEventListener("mentorhub:changed", syncStudentView);
+window.addEventListener("focus", syncStudentView);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    syncStudentView();
+  }
+});
 </script>
 
 </body>

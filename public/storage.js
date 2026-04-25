@@ -73,6 +73,7 @@ const MentorStorage = (() => {
 
   function saveData(data) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    window.dispatchEvent(new Event("mentorhub:changed"));
   }
 
   function nextId(data, key) {
