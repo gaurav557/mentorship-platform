@@ -12,6 +12,7 @@ router.get("/", async (req, res) => {
         s.mentee_id,
         s.answer,
         s.status,
+        s.created_at,
         f.comment,
         f.score
       FROM submissions s

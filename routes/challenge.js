@@ -4,15 +4,23 @@ const db = require("../db");
 // CREATE CHALLENGE
 router.post("/create", async (req, res) => {
   try {
-    const { mentor_id, title, description, deadline, session_id } = req.body;
+    const { mentor_id, title, description, subject, difficulty, deadline, session_id } = req.body;
 
     if (!mentor_id || !title || !description) {
       return res.status(400).json({ message: "Missing fields" });
     }
 
     await db.query(
-      "INSERT INTO challenges(mentor_id,title,description,deadline,session_id) VALUES($1,$2,$3,$4,$5)",
-      [mentor_id, title, description, deadline || null, session_id || null]
+      "INSERT INTO challenges(mentor_id,title,description,subject,difficulty,deadline,session_id) VALUES($1,$2,$3,$4,$5,$6,$7)",
+      [
+        mentor_id,
+        title,
+        description,
+        subject || null,
+        difficulty || null,
+        deadline || null,
+        session_id || null,
+      ]
     );
 
     res.json({ message: "Challenge Created ✅" });

@@ -325,7 +325,7 @@ let chart,lineChart,barChart;
 /* LOAD CHALLENGES */
 function loadSessions() {
 
-  fetch("http://localhost:5000/api/session")
+  fetch("/api/session")
   .then(res => res.json())
   .then(data => {
 
@@ -347,7 +347,7 @@ function createSession(){
   const title = document.getElementById("sessionTitle").value;
   const description = document.getElementById("sessionDesc").value;
 
-  fetch("http://localhost:5000/api/session",{
+  fetch("/api/session",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({title, description})
@@ -364,7 +364,7 @@ function createSession(){
 // loadchallenges----
 function loadChallenges(){
 
- fetch("http://localhost:5000/api/challenge/all")
+ fetch("/api/challenge/all")
  .then(res=>res.json())
  .then(data=>{
 
@@ -395,7 +395,7 @@ function loadChallenges(){
 /* LOAD SUBMISSIONS */
 function loadSubmissions(){
 
- fetch("http://localhost:5000/api/submission")
+ fetch("/api/submission")
  .then(res=>res.json())
  .then(data=>{
 
@@ -460,7 +460,7 @@ function giveFeedback(id){
     return;
   }
 
-  fetch("http://localhost:5000/api/feedback", {
+  fetch("/api/feedback", {
     method:"POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({
@@ -590,7 +590,7 @@ function loadBar(data){
 }
 /* LEADERBOARD */
 function loadLeaderboard(){
- fetch("http://localhost:5000/api/progress")
+ fetch("/api/progress")
  .then(res=>res.json())
  .then(data=>{
   leaderboard.innerHTML=data.map((u,i)=>`
@@ -616,7 +616,7 @@ function createChallenge(){
    return;
  }
 
- fetch("http://localhost:5000/api/challenge/create",{
+ fetch("/api/challenge/create",{
   method:"POST",
   headers:{"Content-Type":"application/json"},
   body:JSON.stringify({

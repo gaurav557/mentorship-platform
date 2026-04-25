@@ -29,7 +29,10 @@ router.post("/login", async (req, res) => {
   if (!valid)
     return res.status(400).json({ message: "Wrong password" });
 
-  const token = jwt.sign({ id: user.id, role: user.role }, "secret");
+  const token = jwt.sign(
+    { id: user.id, role: user.role },
+    process.env.JWT_SECRET || "secret"
+  );
 
   res.json({ token, user });
 });

@@ -248,7 +248,7 @@ function showWelcome(){
 
 // LOAD CHALLENGES
 function loadChallenges(){
- fetch("http://localhost:5000/api/challenge/all")
+ fetch("/api/challenge/all")
  .then(res=>res.json())
  .then(data=>{
    let html="";
@@ -271,7 +271,7 @@ function loadChallenges(){
 function submit(id){
  const answer=document.getElementById("ans"+id).value;
 
- fetch("http://localhost:5000/api/submission",{
+ fetch("/api/submission",{
   method:"POST",
   headers:{"Content-Type":"application/json"},
   body:JSON.stringify({
@@ -284,7 +284,7 @@ function submit(id){
 
 // HISTORY
 function loadHistory(){
- fetch("http://localhost:5000/api/submission")
+ fetch("/api/submission")
  .then(res=>res.json())
  .then(data=>{
 
