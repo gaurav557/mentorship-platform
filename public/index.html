@@ -15,24 +15,19 @@ body{
   background: radial-gradient(circle at top left,#0f2027,#203a43,#2c5364);
   color:white;
 }
-
-/* NAVBAR */
 nav{
   display:flex;
   justify-content:space-between;
   padding:20px 50px;
 }
-
 .logo{
   font-size:24px;
   font-weight:bold;
   animation:glow 2s infinite alternate;
 }
-
 .logo span{
   color:#ff7a18;
 }
-
 @keyframes glow{
   from{ text-shadow:0 0 5px #fff; }
   to{ text-shadow:0 0 20px #ff7a18; }
@@ -42,7 +37,6 @@ nav a{
   margin-left:20px;
   text-decoration:none;
 }
-/* MAIN */
 .main{
   display:flex;
   justify-content:space-around;
@@ -50,7 +44,6 @@ nav a{
   height:85vh;
   padding:20px;
 }
-/* LEFT SIDE */
 .left{
   width:50%;
   padding:40px;
@@ -80,11 +73,9 @@ nav a{
   border-radius:20px;
   margin:5px;
 }
-/* RIGHT SIDE */
 .right{
   width:40%;
 }
-/* CARD */
 .card{
   background:rgba(255,255,255,0.05);
   padding:30px;
@@ -93,7 +84,6 @@ nav a{
   box-shadow:0 10px 40px rgba(0,0,0,0.5);
   animation:slideRight 1s ease;
 }
-/* TOGGLE */
 .toggle{
   display:flex;
   margin-bottom:20px;
@@ -113,7 +103,6 @@ nav a{
   background:#1c2b3a;
   color:#aaa;
 }
-/* TEXT */
 .card h2{
   margin-bottom:10px;
 }
@@ -121,7 +110,6 @@ nav a{
   font-size:14px;
   opacity:0.7;
 }
-/* BUTTON GROUP */
 .actions{
   display:flex;
   gap:10px;
@@ -134,7 +122,6 @@ nav a{
   border-radius:10px;
   cursor:pointer;
 }
-
 .login-btn{
   background:linear-gradient(45deg,#ff7a18,#ff4e50);
   color:white;
@@ -143,7 +130,6 @@ nav a{
   background:#1c2b3a;
   color:white;
 }
-/* INPUT */
 input{
   width:100%;
   padding:12px;
@@ -153,7 +139,6 @@ input{
   background:#1c2b3a;
   color:white;
 }
-/* MAIN BUTTON */
 .enter{
   width:100%;
   padding:12px;
@@ -163,7 +148,6 @@ input{
   margin-top:10px;
   cursor:pointer;
 }
-/* ANIMATION */
 @keyframes slideLeft{
   from{ transform:translateX(-100px); opacity:0; }
   to{ transform:translateX(0); opacity:1; }
@@ -180,10 +164,8 @@ footer{
 </head>
 
 <body>
-
-<!-- NAVBAR -->
 <nav>
-  <div class="logo">🚀 Mentor<span>Hub</span></div>
+  <div class="logo">Mentor<span>Hub</span></div>
   <div>
     <a href="index.html">Home</a>
     <a href="features.html">Features</a>
@@ -191,10 +173,7 @@ footer{
   </div>
 </nav>
 
-<!-- MAIN -->
 <div class="main">
-
-  <!-- LEFT -->
   <div class="left">
     <small>MENTORSHIP PLATFORM</small>
     <h1>
@@ -211,14 +190,12 @@ footer{
     <div class="tags">
       <span>Mentor portal</span>
       <span>Progress tracking</span>
-      <span>mentee protal</span>
+      <span>Mentee portal</span>
     </div>
   </div>
 
-  <!-- RIGHT -->
   <div class="right">
     <div class="card">
-
       <div class="toggle">
         <button id="mentorBtn" class="active" onclick="setRole('mentor')">Mentor Login</button>
         <button id="menteeBtn" class="inactive" onclick="setRole('mentee')">Student Login</button>
@@ -239,64 +216,45 @@ footer{
       <input type="password" id="password" placeholder="Password">
 
       <button class="enter" onclick="login()">Enter Workspace</button>
-
-
     </div>
   </div>
-
 </div>
 
 <footer>
-  © 2026 MentorHub 
+  &copy; 2026 MentorHub
 </footer>
 
+<script src="storage.js"></script>
 <script>
-let role="mentor";
+let role = "mentor";
 
-function setRole(r){
-  role=r;
-
+function setRole(nextRole){
+  role = nextRole;
   document.getElementById("title").innerText =
-    r==="mentor" ? "Mentor workspace access" : "Student workspace access";
+    nextRole === "mentor" ? "Mentor workspace access" : "Student workspace access";
 
-  mentorBtn.className = r==="mentor" ? "active" : "inactive";
-  menteeBtn.className = r==="mentee" ? "active" : "inactive";
+  mentorBtn.className = nextRole === "mentor" ? "active" : "inactive";
+  menteeBtn.className = nextRole === "mentee" ? "active" : "inactive";
 }
 
-// LOGIN
 function login(){
- fetch("/api/auth/login",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({
-    email:email.value,
-    password:password.value
-  })
- })
- .then(res=>res.json())
- .then(data=>{
+  const data = MentorStorage.loginUser({
+    email: email.value,
+    password: password.value
+  });
 
-  if(!data.user){
-    alert("Login failed ");
+  if(!data || !data.user){
+    alert("Login failed");
     return;
   }
 
-  //  MAIN FIX HERE
   if(data.user.role !== role){
-    alert(" Wrong role selected!\nPlease select correct login type.");
+    alert("Wrong role selected. Please choose the correct login type.");
     return;
   }
 
   localStorage.setItem("user", JSON.stringify(data));
-
-  if(role === "mentor"){
-    window.location.href="mentor.html";
-  } else {
-    window.location.href="mentee.html";
-  }
-
- })
- .catch(()=>alert("Server error "));
+  window.location.href = role === "mentor" ? "mentor.html" : "mentee.html";
 }
 </script>
 

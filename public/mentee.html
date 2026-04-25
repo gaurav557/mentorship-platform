@@ -2,7 +2,6 @@
 <html>
 <head>
 <title>Mentee Dashboard</title>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -12,16 +11,12 @@ body{
   background:linear-gradient(135deg,#667eea,#764ba2);
   color:white;
 }
-
-/* NAV */
 nav{
   display:flex;
   justify-content:space-between;
   padding:15px 30px;
   background:rgba(0,0,0,0.3);
 }
-
-/* WELCOME */
 #welcomeBox{
   margin:20px;
   padding:15px;
@@ -31,19 +26,14 @@ nav{
   text-align:center;
   display:none;
 }
-
-/* CONTAINER */
 .container{
   padding:20px;
 }
-
-/* STATS */
 .stats{
   display:flex;
   gap:20px;
   margin-bottom:20px;
 }
-
 .stat{
   flex:1;
   padding:15px;
@@ -51,53 +41,40 @@ nav{
   text-align:center;
   color:white;
 }
-
 .stat:nth-child(1){ background:#ff7a18; }
 .stat:nth-child(2){ background:#28a745; }
 .stat:nth-child(3){ background:#ff9800; }
 .stat:nth-child(4){ background:#17a2b8; }
-
-/* GRID */
 .grid{
   display:grid;
   grid-template-columns:2fr 1fr;
   gap:20px;
 }
-
-/* CARDS */
 .card{
   padding:20px;
   border-radius:12px;
   color:black;
 }
-
-/* DIFFERENT COLORS */
 .challenges-card{
   background:#e3f2fd;
 }
-
 .history-card{
   background:#f3e5f5;
 }
-
 .chart-card{
   background:rgba(255,255,255,0.8);
 }
-
-/* CHALLENGE */
 .challenge{
-  border-bottom:1px solid #ccc;
-  padding:10px 0;
+  background:#f8fafc;
+  padding:12px;
+  border-radius:10px;
+  margin-top:10px;
 }
-
-/* TEXTAREA */
 textarea{
   width:100%;
   padding:10px;
   border-radius:8px;
 }
-
-/* BUTTON */
 button{
   margin-top:10px;
   padding:10px;
@@ -107,23 +84,21 @@ button{
   border-radius:8px;
   cursor:pointer;
 }
-
 button:hover{
   background:#5a67d8;
 }
-
-/* BADGES */
-.badge{
-  padding:5px 10px;
-  border-radius:5px;
-  font-size:12px;
+.badge.reviewed{
+  background:#22c55e;
   color:white;
+  padding:3px 8px;
+  border-radius:6px;
 }
-
-.pending{ background:orange; }
-.reviewed{ background:green; }
-
-/* CHART */
+.badge.pending{
+  background:#f59e0b;
+  color:white;
+  padding:3px 8px;
+  border-radius:6px;
+}
 .chart-box{
   width:100%;
   max-width:400px;
@@ -133,241 +108,187 @@ button:hover{
 .stars{
   font-size:18px;
   letter-spacing:2px;
-  color:#facc15; /* gold color */
-}
-
-.challenge{
-  background:#f8fafc;
-  padding:12px;
-  border-radius:10px;
-  margin-top:10px;
-}
-
-.badge.reviewed{
-  background:#22c55e;
-  color:white;
-  padding:3px 8px;
-  border-radius:6px;
-}
-
-.badge.pending{
-  background:#f59e0b;
-  color:white;
-  padding:3px 8px;
-  border-radius:6px;
+  color:#facc15;
 }
 </style>
-
 </head>
 
 <body>
-
 <nav>
-  <h2>📘 Mentee Dashboard</h2>
+  <h2>Mentee Dashboard</h2>
   <button onclick="logout()">Logout</button>
 </nav>
 
 <div id="welcomeBox"></div>
 
 <div class="container">
-
-<!-- STATS -->
-<div class="stats">
-  <div class="stat">
-    <h3>Total</h3>
-    <p id="totalS">0</p>
+  <div class="stats">
+    <div class="stat">
+      <h3>Total</h3>
+      <p id="totalS">0</p>
+    </div>
+    <div class="stat">
+      <h3>Reviewed</h3>
+      <p id="reviewed">0</p>
+    </div>
+    <div class="stat">
+      <h3>Pending</h3>
+      <p id="pending">0</p>
+    </div>
+    <div class="stat">
+      <h3>Progress</h3>
+      <p id="progress">0%</p>
+    </div>
   </div>
 
-  <div class="stat">
-    <h3>Reviewed</h3>
-    <p id="reviewed">0</p>
+  <div class="card chart-card">
+    <h3>Your Progress</h3>
+    <div class="chart-box">
+      <canvas id="myChart"></canvas>
+    </div>
   </div>
 
-  <div class="stat">
-    <h3>Pending</h3>
-    <p id="pending">0</p>
-  </div>
+  <div class="grid" style="margin-top:20px;">
+    <div class="card challenges-card">
+      <h3>Challenges</h3>
+      <div id="challenges"></div>
+    </div>
 
-  <div class="stat">
-    <h3>Progress</h3>
-    <p id="progress">0%</p>
-  </div>
-</div>
-
-<!-- CHART -->
-<div class="card chart-card">
-  <h3>📊 Your Progress</h3>
-  <div class="chart-box">
-    <canvas id="myChart"></canvas>
+    <div class="card history-card">
+      <h3>History + Feedback</h3>
+      <div id="history"></div>
+    </div>
   </div>
 </div>
 
-<div class="grid">
-
-<!-- CHALLENGES -->
-<div class="card challenges-card">
-  <h3>📌 Challenges</h3>
-  <div id="challenges"></div>
-</div>
-
-<!-- HISTORY -->
-<div class="card history-card">
-  <h3>📜 History + Feedback</h3>
-  <div id="history"></div>
-</div>
-
-</div>
-
-</div>
-
+<script src="storage.js"></script>
 <script>
-
 const userData = JSON.parse(localStorage.getItem("user"));
 if(!userData || userData.user.role !== "mentee"){
   window.location.href="index.html";
 }
 const user = userData.user;
-
 let chart;
 
-// WELCOME
 function showWelcome(){
-  const hour=new Date().getHours();
-  let msg="Welcome";
+  const hour = new Date().getHours();
+  let msg = "Welcome";
 
-  if(hour<12) msg="Good Morning";
-  else if(hour<18) msg="Good Afternoon";
-  else msg="Good Evening";
+  if(hour < 12) msg = "Good Morning";
+  else if(hour < 18) msg = "Good Afternoon";
+  else msg = "Good Evening";
 
-  const box=document.getElementById("welcomeBox");
-  box.innerHTML=`👋 ${msg}, ${user.name}! 🚀`;
-  box.style.display="block";
-
-  setTimeout(()=> box.style.display="none",3000);
+  const box = document.getElementById("welcomeBox");
+  box.innerHTML = `${msg}, ${user.name}!`;
+  box.style.display = "block";
+  setTimeout(() => box.style.display = "none", 3000);
 }
 
-// LOAD CHALLENGES
 function loadChallenges(){
- fetch("/api/challenge/all")
- .then(res=>res.json())
- .then(data=>{
-   let html="";
-   data.forEach(c=>{
-     html+=`
-       <div class="challenge">
-         <h4>${c.title}</h4>
-         <p>${c.description}</p>
+  const data = MentorStorage.getChallenges();
+  let html = "";
 
-         <textarea id="ans${c.id}" placeholder="Your solution"></textarea>
-         <button onclick="submit(${c.id})">Submit</button>
-       </div>
-     `;
-   });
-   document.getElementById("challenges").innerHTML=html;
- });
+  data.forEach((challenge) => {
+    html += `
+      <div class="challenge">
+        <h4>${challenge.title}</h4>
+        <p>${challenge.description}</p>
+        <textarea id="ans${challenge.id}" placeholder="Your solution"></textarea>
+        <button onclick="submit(${challenge.id})">Submit</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("challenges").innerHTML = html || "<p>No challenges found</p>";
 }
 
-// SUBMIT
 function submit(id){
- const answer=document.getElementById("ans"+id).value;
+  const answer = document.getElementById("ans" + id).value.trim();
 
- fetch("/api/submission",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({
-    challenge_id:id,
-    mentee_id:user.id,
+  if(!answer){
+    alert("Please write your solution first");
+    return;
+  }
+
+  MentorStorage.addSubmission({
+    challenge_id: id,
+    mentee_id: user.id,
     answer
-  })
- }).then(()=>loadHistory());
+  });
+
+  document.getElementById("ans" + id).value = "";
+  loadHistory();
 }
 
-// HISTORY
 function loadHistory(){
- fetch("/api/submission")
- .then(res=>res.json())
- .then(data=>{
+  const data = MentorStorage.getSubmissionsWithFeedback();
+  let html = "";
+  let total = 0;
+  let reviewedCount = 0;
+  let pendingCount = 0;
 
-   let html="";
-   let total=0,reviewed=0,pending=0;
+  data.forEach((submission) => {
+    if(Number(submission.mentee_id) !== Number(user.id)) return;
 
-   data.forEach(s=>{
+    total++;
+    if(submission.status === "reviewed") reviewedCount++;
+    else pendingCount++;
 
-     if(Number(s.mentee_id) !== Number(user.id)) return;
+    let stars = "";
+    if(submission.score){
+      for(let i = 1; i <= 5; i++){
+        stars += i <= submission.score ? "★" : "☆";
+      }
+    } else {
+      stars = "Not rated";
+    }
 
-     total++;
-     if(s.status==="reviewed") reviewed++;
-     else pending++;
+    html += `
+      <div class="challenge">
+        <b>Challenge:</b> ${submission.challenge_id}<br>
+        <b>Answer:</b> ${submission.answer}<br>
+        <span class="badge ${submission.status === "reviewed" ? "reviewed" : "pending"}">
+          ${submission.status}
+        </span>
+        <p>${submission.comment || "No feedback yet"}</p>
+        <p class="stars">${stars}</p>
+      </div>
+    `;
+  });
 
-     let stars = "";
-     if(s.score){
-       for(let i=1;i<=5;i++){
-         stars += i <= s.score ? "⭐" : "☆";
-       }
-     } else {
-       stars = "Not rated";
-     }
+  document.getElementById("history").innerHTML = html || "<p>No submissions found</p>";
+  document.getElementById("totalS").innerText = total;
+  document.getElementById("reviewed").innerText = reviewedCount;
+  document.getElementById("pending").innerText = pendingCount;
 
-     html+=`
-       <div class="challenge">
-
-         <b>Challenge:</b> ${s.challenge_id}<br>
-         <b>Answer:</b> ${s.answer}<br>
-
-         <span class="badge ${s.status==="reviewed"?"reviewed":"pending"}">
-           ${s.status}
-         </span>
-
-         <p>💬 ${s.comment || "No feedback yet"}</p>
-
-         <p class="stars">${stars}</p>
-
-       </div>
-     `;
-   });
-
-   document.getElementById("history").innerHTML = html || "<p>No submissions found</p>";
-
-   // ✅ FIXED STATS
-   document.getElementById("totalS").innerText = total;
-   document.getElementById("reviewed").innerText = reviewed;
-   document.getElementById("pending").innerText = pending;
-
-   const progress = total ? Math.round((reviewed/total)*100) : 0;
-   document.getElementById("progress").innerText = progress + "%";
-
-   // ✅ FIXED CHART
-   loadChart(reviewed, pending);
- });
+  const progressValue = total ? Math.round((reviewedCount / total) * 100) : 0;
+  document.getElementById("progress").innerText = progressValue + "%";
+  loadChart(reviewedCount, pendingCount);
 }
 
-// CHART
-function loadChart(r,p){
- if(chart) chart.destroy();
+function loadChart(reviewedCount, pendingCount){
+  if(chart) chart.destroy();
 
- chart=new Chart(document.getElementById("myChart"),{
-  type:'doughnut',
-  data:{
-    labels:['Reviewed','Pending'],
-    datasets:[{data:[r,p]}]
-  },
-  options:{maintainAspectRatio:false}
- });
+  chart = new Chart(document.getElementById("myChart"), {
+    type:'doughnut',
+    data:{
+      labels:['Reviewed','Pending'],
+      datasets:[{data:[reviewedCount,pendingCount]}]
+    },
+    options:{maintainAspectRatio:false}
+  });
 }
 
-// LOGOUT
 function logout(){
- localStorage.removeItem("user");
- window.location.href="index.html";
+  localStorage.removeItem("user");
+  window.location.href="index.html";
 }
 
-// INIT
-window.onload=()=>{
- showWelcome();
- loadChallenges();
- loadHistory();
+window.onload = () => {
+  showWelcome();
+  loadChallenges();
+  loadHistory();
 };
-
 </script>
 
 </body>
