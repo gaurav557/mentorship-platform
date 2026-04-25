@@ -1,4 +1,4 @@
-const db = require("../server/db");
+const db = require("../db");
 
 async function init() {
   await db.query(`
@@ -61,5 +61,7 @@ init()
     process.exitCode = 1;
   })
   .finally(async () => {
-    await db.end();
+    if (typeof db.end === "function") {
+      await db.end();
+    }
   });
